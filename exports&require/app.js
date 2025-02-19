@@ -12,3 +12,5 @@
 //for requiring multiple variables or functions from different file
 
 const {add,subtract}= require("./math") // object Destructuring
+console.log(add(53,5));
+console.log(subtract(53,3));
