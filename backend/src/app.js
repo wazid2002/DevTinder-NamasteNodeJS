@@ -6,7 +6,7 @@ const connectDB = require("./config/db");
 dotenv.config();
 const app=express();
 
-connectDB();
+
 
 app.post("/signup",(req,res)=>{
     const user1={
@@ -21,11 +21,18 @@ app.post("/signup",(req,res)=>{
 
    res.status(201).json({ message: "User saved to DB" });
 })
-                
+      
+connectDB()
+    .then(()=>{
+        console.log("Database connection Established");
+        app.listen(7777,()=>{
+        console.log("Server Started on PORT:7777")
+        })
+    })
+    .catch((err)=>{
+        console.log("Error occured in connecting databse")
+    });
 // app.use("/",(req,res)=>{
 //     res.send("server Check!")
 // })
 
-app.listen(7777,()=>{
-    console.log("Server Started on PORT:7777")
-})
