@@ -6,21 +6,25 @@ const connectDB = require("./config/db");
 dotenv.config();
 const app=express();
 
+//middleware
+app.use(express.json());
 
 
-app.post("/signup",(req,res)=>{
-    const user1={
-        firstName:"wazid",
-        lastName:"munavalli",
-        email:"munavalliwazid@gmail.com",
-        password:"1245"
+
+app.post("/signup", async (req,res)=>{
+
+    try{
+        const user1 = req.body;
+        const user = new User (user1);
+        await user.save();
+
+        res.status(201).json({ message: "User saved to DB" });
     }
-
-    const user = new User (user1);
-    user.save();
-
-   res.status(201).json({ message: "User saved to DB" });
-})
+    catch(err){
+        res.status(500).json({error:"failed to save user"})
+    }
+    
+});
       
 connectDB()
     .then(()=>{
