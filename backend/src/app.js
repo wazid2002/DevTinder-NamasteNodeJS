@@ -39,6 +39,27 @@ app.post("/signup", async (req,res)=>{
     
 });
 
+app.post("/login", async(req,res)=>{
+    try{
+        const {email, password} = req.body;
+        const user= await User.findOne({email:email});
+        if(!user){
+            return res.status(400).json({message:"Invalid Credentials"})
+        }
+
+        const auth= await bcrypt.compare(password,user.password);
+        if(!auth){
+            return res.status(400).json({message:"Invalid Credentials"})
+        }
+
+        res.status(200).send("Login Successful!")
+    }
+    catch(err){
+        res.status(500).json({message:"Internal server Error"+ err})
+    }
+
+});
+
 //get all the users
 
 app.get("/feed",async (req,res)=>{
