@@ -1,5 +1,6 @@
 const express=require("express");
 const dotenv= require("dotenv");
+const bcrypt= require("bcrypt");
 const User= require("./models/user");
 const connectDB = require("./config/db");
 
@@ -12,10 +13,21 @@ app.use(express.json());
 
 
 app.post("/signup", async (req,res)=>{
+     const {firstName, lastName,email,password} = req.body;
 
     try{
-        const user1 = req.body;
-        const user = new User (user1);
+
+        const {firstName, lastName,email,password} = req.body;
+        const secretpass= await bcrypt.hash(password,10);
+
+        const user = new User (
+            {
+                firstName,
+                lastName,
+                email,
+                password:secretpass
+            }
+        );
         await user.save();
 
         res.status(201).json({ message: "User saved to DB" });
