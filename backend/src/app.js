@@ -13,11 +13,10 @@ app.use(express.json());
 
 
 app.post("/signup", async (req,res)=>{
-     const {firstName, lastName,email,password} = req.body;
-
     try{
 
         const {firstName, lastName,email,password} = req.body;
+        
         const secretpass= await bcrypt.hash(password,10);
 
         const user = new User (
