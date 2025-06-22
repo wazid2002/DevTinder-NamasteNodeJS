@@ -16,7 +16,7 @@ app.post("/signup", async (req,res)=>{
     try{
 
         const {firstName, lastName,email,password} = req.body;
-        
+
         const secretpass= await bcrypt.hash(password,10);
 
         const user = new User (
@@ -32,7 +32,7 @@ app.post("/signup", async (req,res)=>{
         res.status(201).json({ message: "User saved to DB" });
     }
     catch(err){
-        res.status(500).json({error:"failed to save user"})
+        res.status(500).json({error:"failed to save user:" + err})
     }
     
 });
@@ -73,15 +73,11 @@ app.get("/user",async(req,res)=>{
     }
 });
 
-app.patch("/update",async(req,res)=>{
-    const useremail= req.body.email;
+app.patch("/update/:userid",async(req,res)=>{
+    const userid= req.params.userid
     const data=req.body;
-
-    console.log(useremail);
-    console.log(data);
-
     try{
-        const updated= await User.updateOne({email:useremail},{$set:data});
+        const updated= await User.findByIdAndUpdate(userid,data,{runValidators:true});
         
 
         if(!updated){
@@ -89,8 +85,8 @@ app.patch("/update",async(req,res)=>{
         }
         res.status(200).json({message:"user updated succesfully"});
     }
-    catch{
-         res.status(500).json({message:"server error"});
+    catch(err){
+         res.status(500).json({message:"server error:" + err});
   
     }
 })
