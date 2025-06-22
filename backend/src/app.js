@@ -3,6 +3,7 @@ const dotenv= require("dotenv");
 const bcrypt= require("bcrypt");
 const User= require("./models/user");
 const connectDB = require("./config/db");
+const validator = require("./utils/validator");
 
 dotenv.config();
 const app=express();
@@ -10,12 +11,13 @@ const app=express();
 //middleware
 app.use(express.json());
 
-
-
 app.post("/signup", async (req,res)=>{
     try{
 
         const {firstName, lastName,email,password} = req.body;
+
+        //custom validator(api level)
+        validator(req);
 
         const secretpass= await bcrypt.hash(password,10);
 
@@ -77,6 +79,15 @@ app.patch("/update/:userid",async(req,res)=>{
     const userid= req.params.userid
     const data=req.body;
     try{
+
+        const allowed_update=["gender", "Bio","skills","profilePicURL"]
+        const isUpdateAllowed= Object.keys(data).every((k)=>
+        allowed_update.includes(k));
+
+        if(!isUpdateAllowed){
+            throw new Error("Updates not allowed")
+        }
+
         const updated= await User.findByIdAndUpdate(userid,data,{runValidators:true});
         
 
