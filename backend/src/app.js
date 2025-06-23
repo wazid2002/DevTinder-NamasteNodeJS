@@ -52,13 +52,13 @@ app.post("/login", async(req,res)=>{
             return res.status(400).json({message:"Invalid Credentials"})
         }
 
-        const auth= await bcrypt.compare(password,user.password);
+        const auth= await user.validatePassword(password);
         if(!auth){
             return res.status(400).json({message:"Invalid Credentials"})
         }
 
         //create a jwt token
-        const gentoken=jwt.sign({_id:user._id},"Wazid1234",{expiresIn:'1d'})
+        const gentoken=await user.getjwt();
 
         //add tokaen to cookie and send to client
 
