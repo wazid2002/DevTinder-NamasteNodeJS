@@ -4,6 +4,7 @@ const bcrypt= require("bcrypt");
 const User= require("./models/user");
 const connectDB = require("./config/db");
 const validator = require("./utils/validator");
+const userAuth = require("./utils/userAuth")
 const cookieParser = require("cookie-parser");
 const jwt=require("jsonwebtoken");
 
@@ -57,11 +58,11 @@ app.post("/login", async(req,res)=>{
         }
 
         //create a jwt token
-        const gentoken=jwt.sign({_id:user._id},"Wazid1234")
+        const gentoken=jwt.sign({_id:user._id},"Wazid1234",{expiresIn:'1d'})
 
         //add tokaen to cookie and send to client
 
-        res.cookie("token",gentoken);
+        res.cookie("token",gentoken,{expires: new Date(Date.now() + 2 * 3600000)});
 
         res.status(200).send("Login Successful!")
     }
@@ -88,21 +89,9 @@ app.get("/feed",async (req,res)=>{
 });
 
 //profile route
-app.get("/profile",async (req,res)=>{
+app.get("/profile",userAuth, (req,res)=>{
     try{
-        const token= req.cookies?.token;
-        if(!token){
-            return res.status(401).json({ error: "Token missing" })
-        }
-        const decode=await jwt.verify(token,"Wazid1234")
-        if(!decode){
-            return res.status(401).json({ error: "Token missing" })
-        }
-        const userdata = await User.findById(decode);
-        if(!userdata){
-            return res.status(401).json({ error: "Token missing" })
-        }
-        res.status(200).send(userdata);
+        res.status(200).json(req.user);
     }
     catch(err){
         res.status(500).json({error:"server Error:"+ err});
