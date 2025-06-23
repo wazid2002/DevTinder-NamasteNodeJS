@@ -4,12 +4,15 @@ const bcrypt= require("bcrypt");
 const User= require("./models/user");
 const connectDB = require("./config/db");
 const validator = require("./utils/validator");
+const cookieParser = require("cookie-parser");
+const jwt=require("jsonwebtoken");
 
 dotenv.config();
 const app=express();
 
 //middleware
 app.use(express.json());
+app.use(cookieParser());
 
 app.post("/signup", async (req,res)=>{
     try{
@@ -41,6 +44,7 @@ app.post("/signup", async (req,res)=>{
 
 app.post("/login", async(req,res)=>{
     try{
+
         const {email, password} = req.body;
         const user= await User.findOne({email:email});
         if(!user){
@@ -51,6 +55,13 @@ app.post("/login", async(req,res)=>{
         if(!auth){
             return res.status(400).json({message:"Invalid Credentials"})
         }
+
+        //create a jwt token
+        const gentoken=jwt.sign({_id:user._id},"Wazid1234")
+
+        //add tokaen to cookie and send to client
+
+        res.cookie("token",gentoken);
 
         res.status(200).send("Login Successful!")
     }
@@ -75,6 +86,29 @@ app.get("/feed",async (req,res)=>{
         res.status(500).json({error:"failed to load users"})
     }
 });
+
+//profile route
+app.get("/profile",async (req,res)=>{
+    try{
+        const token= req.cookies?.token;
+        if(!token){
+            return res.status(401).json({ error: "Token missing" })
+        }
+        const decode=await jwt.verify(token,"Wazid1234")
+        if(!decode){
+            return res.status(401).json({ error: "Token missing" })
+        }
+        const userdata = await User.findById(decode);
+        if(!userdata){
+            return res.status(401).json({ error: "Token missing" })
+        }
+        res.status(200).send(userdata);
+    }
+    catch(err){
+        res.status(500).json({error:"server Error:"+ err});
+    }
+
+})
 
 //get one user
 
