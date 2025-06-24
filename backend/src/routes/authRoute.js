@@ -1,0 +1,65 @@
+const express = require("express");
+const authRoute = express.Router();
+const User = require("../models/user");
+const validator = require("../utils/validator");
+const bcrypt = require("bcrypt")
+
+
+authRoute.post("/signup", async (req,res)=>{
+    try{
+
+        const {firstName, lastName,email,password} = req.body;
+
+        //custom validator(api level)
+        validator(req);
+
+        const secretpass= await bcrypt.hash(password,10);
+
+        const user = new User (
+            {
+                firstName,
+                lastName,
+                email,
+                password:secretpass
+            }
+        );
+        await user.save();
+
+        res.status(201).json({ message: "User saved to DB" });
+    }
+    catch(err){
+        res.status(500).json({error:"failed to save user:" + err})
+    }
+    
+});
+
+authRoute.post("/login", async(req,res)=>{
+    try{
+
+        const {email, password} = req.body;
+        const user= await User.findOne({email:email});
+        if(!user){
+            return res.status(400).json({message:"Invalid Credentials"})
+        }
+
+        const auth= await user.validatePassword(password);
+        if(!auth){
+            return res.status(400).json({message:"Invalid Credentials"})
+        }
+
+        //create a jwt token
+        const gentoken=await user.getjwt();
+
+        //add tokaen to cookie and send to client
+
+        res.cookie("token",gentoken,{expires: new Date(Date.now() + 2 * 3600000)});
+
+        res.status(200).send("Login Successful!")
+    }
+    catch(err){
+        res.status(500).json({message:"Internal server Error"+ err})
+    }
+
+});
+
+module.exports=authRoute;

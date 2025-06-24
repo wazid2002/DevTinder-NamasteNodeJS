@@ -1,76 +1,24 @@
 const express=require("express");
 const dotenv= require("dotenv");
-const bcrypt= require("bcrypt");
 const User= require("./models/user");
 const connectDB = require("./config/db");
-const validator = require("./utils/validator");
-const userAuth = require("./utils/userAuth")
 const cookieParser = require("cookie-parser");
-const jwt=require("jsonwebtoken");
+const authRoute = require("./routes/authRoute");
+const profileRoute = require("./routes/profileRoute");
 
 dotenv.config();
 const app=express();
+
 
 //middleware
 app.use(express.json());
 app.use(cookieParser());
 
-app.post("/signup", async (req,res)=>{
-    try{
 
-        const {firstName, lastName,email,password} = req.body;
+//Route
+app.use("/",authRoute);
+app.use("/",profileRoute);
 
-        //custom validator(api level)
-        validator(req);
-
-        const secretpass= await bcrypt.hash(password,10);
-
-        const user = new User (
-            {
-                firstName,
-                lastName,
-                email,
-                password:secretpass
-            }
-        );
-        await user.save();
-
-        res.status(201).json({ message: "User saved to DB" });
-    }
-    catch(err){
-        res.status(500).json({error:"failed to save user:" + err})
-    }
-    
-});
-
-app.post("/login", async(req,res)=>{
-    try{
-
-        const {email, password} = req.body;
-        const user= await User.findOne({email:email});
-        if(!user){
-            return res.status(400).json({message:"Invalid Credentials"})
-        }
-
-        const auth= await user.validatePassword(password);
-        if(!auth){
-            return res.status(400).json({message:"Invalid Credentials"})
-        }
-
-        //create a jwt token
-        const gentoken=await user.getjwt();
-
-        //add tokaen to cookie and send to client
-
-        res.cookie("token",gentoken,{expires: new Date(Date.now() + 2 * 3600000)});
-
-        res.status(200).send("Login Successful!")
-    }
-    catch(err){
-        res.status(500).json({message:"Internal server Error"+ err})
-    }
-
-});
 
 //get all the users
 
@@ -88,16 +36,7 @@ app.get("/feed",async (req,res)=>{
     }
 });
 
-//profile route
-app.get("/profile",userAuth, (req,res)=>{
-    try{
-        res.status(200).json(req.user);
-    }
-    catch(err){
-        res.status(500).json({error:"server Error:"+ err});
-    }
 
-})
 
 //get one user
 
@@ -156,7 +95,3 @@ connectDB()
     .catch((err)=>{
         console.log("Error occured in connecting databse")
     });
-// app.use("/",(req,res)=>{
-//     res.send("server Check!")
-// })
-
