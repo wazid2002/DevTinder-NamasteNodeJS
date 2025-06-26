@@ -24,4 +24,31 @@ userRouter.get("/user/requests/recieved",userAuth, async(req,res)=>{
     }
 });
 
+userRouter.get("/user/connections", userAuth , async (req,res)=>{
+    try{
+        currentUser = req.user;
+
+        const connections = await Connection.find({
+            $or:[
+                {fromUserId:currentUser._id,status:"accepted"},
+                {toUserId:currentUser._id,status:"accepted"}
+            ]
+        })
+        .populate("fromUserId","firstName lastName gender Bio skills profilePicURL")
+        .populate("toUserId","firstName lastName gender Bio skills profilePicURL");
+
+        const data = connections.map((row)=>{
+             if(currentUser._id.toString() === row.fromUserId._id.toString()){
+                return row.toUserId;
+             }else{
+                return row.fromUserId;
+             }
+        });
+        res.json({data});
+
+    }catch(err){
+        res.status(500).json({message:"internal Server error" +err});
+    }
+})
+
 module.exports=userRouter;

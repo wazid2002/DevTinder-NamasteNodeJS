@@ -71,7 +71,7 @@ requestrouter.post("/request/review/:status/:reqId",userAuth ,async(req,res)=>{
 
         connectionrequest.status=status;
         const data = await connectionrequest.save();
-        res.status(500).json({message:"Connection request-"+status, data});
+        res.status(200).json({message:"Connection request-"+status, data});
 
 
     }catch(err){
