@@ -6,6 +6,7 @@ const cookieParser = require("cookie-parser");
 const authRoute = require("./routes/authRoute");
 const profileRoute = require("./routes/profileRoute");
 const connectionRoutes = require("./routes/connectionRoute");
+const userRouter = require("./routes/userRoutes");
 
 dotenv.config();
 const app=express();
@@ -19,7 +20,8 @@ app.use(cookieParser());
 //Route
 app.use("/",authRoute);
 app.use("/",profileRoute);
-app.use("/",connectionRoutes)
+app.use("/",connectionRoutes);
+app.use("/",userRouter);
 
 
 //get all the users

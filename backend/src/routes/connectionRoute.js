@@ -32,7 +32,7 @@ requestrouter.post("/request/send/:status/:toUserId",userAuth,async (req,res)=>{
                 return res.status(404).json({message:"User does not exists"});
             }
 
-        const connection= new ConnectionRequest({
+            const connection= new ConnectionRequest({
             fromUserId,
             toUserId,
             status
@@ -47,6 +47,35 @@ requestrouter.post("/request/send/:status/:toUserId",userAuth,async (req,res)=>{
     }
     catch(err){
         res.status(500).json({message:"Server Error" +err});
+    }
+});
+
+requestrouter.post("/request/review/:status/:reqId",userAuth ,async(req,res)=>{
+    try{
+        const loggedInUser= req.user;
+        const {status,reqId}= req.params;
+
+        const allowedStatus=["accepted","rejected"];
+        if(!allowedStatus.includes(status)){
+            return res.status(400).json({message:"Status not valid!"});
+        }
+
+        const connectionrequest= await ConnectionRequest.findOne({
+            _id:reqId,
+            toUserId:loggedInUser._id,
+            status:"interested"
+        });
+        if (!connectionrequest){
+            return res.status(404).json({message:"Request not found"})
+        }
+
+        connectionrequest.status=status;
+        const data = await connectionrequest.save();
+        res.status(500).json({message:"Connection request-"+status, data});
+
+
+    }catch(err){
+        res.status(500).json({message:"Internal Server Error:"+ err});
     }
 });
 
