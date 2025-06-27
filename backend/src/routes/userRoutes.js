@@ -49,6 +49,20 @@ userRouter.get("/user/connections", userAuth , async (req,res)=>{
     }catch(err){
         res.status(500).json({message:"internal Server error" +err});
     }
-})
+});
+
+
+userRouter.get("/feed",userAuth,async (req,res)=>{
+    try{
+
+       const currentUser = req.user; 
+       
+        
+    }
+    catch{
+        res.status(500).json({error:""})
+    }
+});
+
 
 module.exports=userRouter;
