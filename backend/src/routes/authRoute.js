@@ -52,9 +52,14 @@ authRoute.post("/login", async(req,res)=>{
 
         //add tokaen to cookie and send to client
 
-        res.cookie("token",gentoken,{expires: new Date(Date.now() + 2 * 3600000)});
+        res.cookie("token", gentoken, {
+            httpOnly: true,         // Protect from client-side JS access
+            secure: false,          // Set to true if using HTTPS
+            sameSite: "lax",        // or "none" if secure: true
+            maxAge: 2 * 60 * 60 * 1000 // 2 hours
+        });
 
-        res.status(200).send("Login Successful!")
+        res.status(200).send(user);
     }
     catch(err){
         res.status(500).json({message:"Internal server Error"+ err})

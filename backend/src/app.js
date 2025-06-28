@@ -7,12 +7,18 @@ const authRoute = require("./routes/authRoute");
 const profileRoute = require("./routes/profileRoute");
 const connectionRoutes = require("./routes/connectionRoute");
 const userRouter = require("./routes/userRoutes");
+const cors = require("cors")
+
+
+
 
 dotenv.config();
 const app=express();
 
 
 //middleware
+app.use(cors({origin: "http://localhost:5173",
+  credentials: true}));
 app.use(express.json());
 app.use(cookieParser());
 

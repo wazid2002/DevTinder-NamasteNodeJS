@@ -2,7 +2,7 @@ import React from 'react';
 
 const Footer = () => {
   return (
-    <footer className="footer sm:footer-horizontal bg-base-300 text-neutral-content p-10 fixed bottom-0">
+    <footer className="footer sm:footer-horizontal bg-base-300 text-neutral-content p-10  ">
       <aside className="flex items-center gap-4">
         <img src="/code.png" alt="DevTinder Logo" className="w-12 h-12 rounded" />
         <p>
