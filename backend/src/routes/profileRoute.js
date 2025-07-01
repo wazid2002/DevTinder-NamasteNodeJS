@@ -18,26 +18,27 @@ profileRouter.get("/profile/view",userAuth, (req,res)=>{
 
 });
 
-profileRouter.patch("/profile/edit",userAuth,async (req,res)=>{
-    try{
-
-        //validator for update fields
-        updateValidator(req);
-        if(!updateValidator){
-            throw new Error("Update not allowed");
-        }
-        const loggedInUser = req.user;
-
-        Object.keys(req.body).forEach((key)=>(loggedInUser[key]=req.body[key]));
-
-        await loggedInUser.save();
-
-        res.status(200).json({message:`${loggedInUser.firstName},Your Profile is Succesfully Updated`});
-
-    }catch(err){
-        res.status(500).json({error:"server Error:"+err});
+profileRouter.patch("/profile/edit", userAuth, async (req, res) => {
+  try {
+    const isValid = updateValidator(req);
+    if (!isValid) {
+      throw new Error("Update not allowed");
     }
+
+    const loggedInUser = req.user;
+
+    Object.keys(req.body).forEach((key) => {
+      loggedInUser[key] = req.body[key];
+    });
+
+    await loggedInUser.save();
+
+    res.status(200).json({ data: loggedInUser });
+  } catch (err) {
+    res.status(500).json({ error: err.message || "Server error" });
+  }
 });
+
 
 profileRouter.patch("/profile/password",userAuth, async(req,res)=>{
     try{
@@ -49,7 +50,7 @@ profileRouter.patch("/profile/password",userAuth, async(req,res)=>{
         const secretpass=await bcrypt.hash(newPassword,10);
         const user = req.user;
         user.password=secretpass;
-        user.save();
+        await user.save();
         res.cookie("token",null,{expires:new Date(Date.now())});
         res.send("Password Updated Succesfully,Please Login with the new password")
     }catch (err) {

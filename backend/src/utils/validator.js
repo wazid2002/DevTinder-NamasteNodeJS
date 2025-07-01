@@ -11,7 +11,7 @@ function validator(req){
 };
 
 function updateValidator(req){
-   const allowedUpdateFields=["firstName","lastName","gender","Bio","skills","profilePicURL" ];
+   const allowedUpdateFields=["firstName","lastName","gender","about","skills","profilePicURL","age"];
 
    const updateAllowed=Object.keys(req.body).every((key)=>{
       return allowedUpdateFields.includes(key);
@@ -19,6 +19,8 @@ function updateValidator(req){
    if(!updateAllowed){
       throw new Error("Update not allowed");
    }
+
+   return true;
 }
 
 module.exports={validator,updateValidator}

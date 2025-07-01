@@ -38,8 +38,11 @@ const userSchema = new mongoose.Schema({
     password:{
         type:String
     },
-    Bio:{
+    about:{
         type:String
+    },
+    age:{
+        type:Number
     },
     skills:{
         type:[String]
