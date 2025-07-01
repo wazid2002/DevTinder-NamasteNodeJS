@@ -4,7 +4,16 @@ import { useDispatch } from "react-redux";
 import { removeUserFromFeed } from "../utils/feedSlice";
 
 const UserCard = ({ user }) => {
-  const { _id, firstName, lastName, profilePicURL, age, gender, about } = user;
+  const {
+    _id,
+    firstName = "",
+    lastName = "",
+    profilePicURL = "",
+    age = "",
+    gender = "",
+    about = "",
+  } = user;
+
   const dispatch = useDispatch();
 
   const handleSendRequest = async (status, userId) => {
@@ -15,18 +24,23 @@ const UserCard = ({ user }) => {
         { withCredentials: true }
       );
       dispatch(removeUserFromFeed(userId));
-    } catch (err) {}
+    } catch (err) {
+      console.error("Error sending request:", err);
+    }
   };
 
   return (
     <div className="card bg-base-300 w-96 shadow-xl">
       <figure>
-        <img src={user.profilePicURL} alt="photo" />
+        <img
+          src={profilePicURL || "https://via.placeholder.com/150"}
+          alt="profile"
+        />
       </figure>
       <div className="card-body">
         <h2 className="card-title">{firstName + " " + lastName}</h2>
-        {age || gender || <p>{age + ", " + gender}</p>}
-        <p>{about}</p>
+        {(age || gender) && <p>{[age, gender].filter(Boolean).join(", ")}</p>}
+        {about && <p>{about}</p>}
         <div className="card-actions justify-center my-4">
           <button
             className="btn btn-primary"
@@ -45,4 +59,5 @@ const UserCard = ({ user }) => {
     </div>
   );
 };
+
 export default UserCard;
