@@ -12,7 +12,7 @@ userRouter.get("/user/requests/recieved",userAuth, async(req,res)=>{
         const requests = await Connection.find({
             toUserId:currentUser,
             status:"interested"
-        }).populate("fromUserId","firstName lastName gender Bio skills profilePicURL");
+        }).populate("fromUserId","firstName lastName gender about age skills profilePicURL");
 
         if(requests.length===0){
             return res.status(200).json({message:"No connection requests!"})
