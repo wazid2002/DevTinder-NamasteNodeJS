@@ -35,8 +35,8 @@ userRouter.get("/user/connections", userAuth , async (req,res)=>{
                 {toUserId:currentUser._id,status:"accepted"}
             ]
         })
-        .populate("fromUserId","firstName lastName gender Bio skills profilePicURL")
-        .populate("toUserId","firstName lastName gender Bio skills profilePicURL");
+        .populate("fromUserId","firstName lastName gender about age skills profilePicURL")
+        .populate("toUserId","firstName lastName gender about age skills profilePicURL");
 
         const data = connections.map((row)=>{
              if(currentUser._id.toString() === row.fromUserId._id.toString()){
