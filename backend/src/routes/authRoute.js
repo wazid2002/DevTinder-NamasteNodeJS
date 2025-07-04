@@ -23,9 +23,16 @@ authRoute.post("/signup", async (req,res)=>{
                 password:secretpass
             }
         );
-        await user.save();
+        const signedUser = await user.save();
+        const token = await signedUser.getjwt();
 
-        res.status(201).json({ message: "User saved to DB" });
+        res.cookie("token",token,{
+            httpOnly: true,        
+            secure: false,          
+            sameSite: "lax",        
+            maxAge: 2 * 60 * 60 * 1000});
+
+        res.status(200).json({ message: "User saved to DB" ,data:signedUser});
     }
     catch(err){
         res.status(500).json({error:"failed to save user:" + err})
