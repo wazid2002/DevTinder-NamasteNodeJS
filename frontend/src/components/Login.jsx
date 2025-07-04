@@ -8,8 +8,11 @@ import { BASE_URL } from '../utils/constants';
 
 
 const Login = () => {
-  const [email,setEmailID] = useState("")
+  const [email,setEmailId] = useState("")
   const [password,setPassword]= useState("")
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [isLoginForm, setIsLoginForm] = useState(true);
   const [error, setError] = useState("");
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -26,35 +29,101 @@ const Login = () => {
     }catch(err){
       setError(err?.response?.data?.message);
     }
-  }
+  };
 
-  return (
-    <div className='flex justify-center items-center min-h-screen'>
-       <div className="card bg-base-300 image-full w-96 shadow-sm">
-  <figure>
-    <img
-      src="/user.jpg"
-      alt="user" />
-  </figure>
-  <div className="card-body">
-    <h2 className="card-title">Login</h2>
-    <fieldset className="fieldset">
-    <legend className="fieldset-legend">Enter Your Registered Email:</legend>
-    <input type="text" className="input" value={email} onChange={(e)=>setEmailID(e.target.value)}/>
-    </fieldset>
-    <fieldset className="fieldset">
-    <legend className="fieldset-legend">Password:</legend>
-    <input type="password" className="input" value={password} onChange={(e)=>setPassword(e.target.value)}/>
-    </fieldset>
-    <p className='text-red-600'>{error}</p>
-    <div className="card-actions justify-center">
-      <button className="btn btn-primary w-20" onClick={handleLogin}>Login</button>
+   const handleSignUp = async () => {
+    try {
+      const res = await axios.post(
+        BASE_URL + "/signup",
+        { firstName, lastName, email, password },
+        { withCredentials: true }
+      );
+      dispatch(addUser(res.data.data));
+      return navigate("/profile");
+    } catch (err) {
+      setError(err?.response?.data || "Something went wrong");
+    }
+  };
+
+    return (
+    <div className="flex justify-center my-10">
+      <div className="card bg-base-300 w-96 shadow-xl">
+        <div className="card-body">
+          <h2 className="card-title justify-center">
+            {isLoginForm ? "Login" : "Sign Up"}
+          </h2>
+          <div>
+            {!isLoginForm && (
+              <>
+                <label className="form-control w-full max-w-xs my-2">
+                  <div className="label">
+                    <span className="label-text">First Name</span>
+                  </div>
+                  <input
+                    type="text"
+                    value={firstName}
+                    className="input input-bordered w-full max-w-xs"
+                    onChange={(e) => setFirstName(e.target.value)}
+                  />
+                </label>
+                <label className="form-control w-full max-w-xs my-2">
+                  <div className="label">
+                    <span className="label-text">Last Name</span>
+                  </div>
+                  <input
+                    type="text"
+                    value={lastName}
+                    className="input input-bordered w-full max-w-xs"
+                    onChange={(e) => setLastName(e.target.value)}
+                  />
+                </label>
+              </>
+            )}
+            <label className="form-control w-full max-w-xs my-2">
+              <div className="label">
+                <span className="label-text">Email ID:</span>
+              </div>
+              <input
+                type="text"
+                value={email}
+                className="input input-bordered w-full max-w-xs"
+                onChange={(e) => setEmailId(e.target.value)}
+              />
+            </label>
+            <label className="form-control w-full max-w-xs my-2">
+              <div className="label">
+                <span className="label-text">Password</span>
+              </div>
+              <input
+                type="password"
+                value={password}
+                className="input input-bordered w-full max-w-xs"
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </label>
+          </div>
+          <p className="text-red-500">{error}</p>
+          <div className="card-actions justify-center m-2">
+            <button
+              className="btn btn-primary"
+              onClick={isLoginForm ? handleLogin : handleSignUp}
+            >
+              {isLoginForm ? "Login" : "Sign Up"}
+            </button>
+          </div>
+
+          <p
+            className="m-auto cursor-pointer py-2"
+            onClick={() => setIsLoginForm((value) => !value)}
+          >
+            {isLoginForm
+              ? "New User? Signup Here"
+              : "Existing User? Login Here"}
+          </p>
+        </div>
+      </div>
     </div>
-  </div>
-</div>
-</div>
-   
-  )
-}
+  );
+};
 
 export default Login
